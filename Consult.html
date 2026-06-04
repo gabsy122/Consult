@@ -572,55 +572,56 @@
         border: 1px solid rgba(52, 211, 153, 0.15);
     }
 
-    /* Service Level Badges */
-    .badge-level-standard {
+    /* Priority Badges (formerly Service Level) */
+    .badge-priority-p4 {
         background: rgba(148, 163, 184, 0.08);
         color: #cbd5e1;
         border: 1px solid rgba(148, 163, 184, 0.15);
     }
     
-    .badge-level-priority {
+    .badge-priority-p3 {
+        background: rgba(59, 130, 246, 0.08);
+        color: #60a5fa;
+        border: 1px solid rgba(59, 130, 246, 0.15);
+    }
+    
+    .badge-priority-p2 {
         background: rgba(245, 158, 11, 0.08);
         color: #fbbf24;
         border: 1px solid rgba(245, 158, 11, 0.15);
     }
     
-    .badge-level-urgent {
+    .badge-priority-p1 {
         background: rgba(236, 72, 153, 0.08);
         color: #f472b6;
         border: 1px solid rgba(236, 72, 153, 0.15);
     }
     
-    .badge-level-critical {
+    .badge-priority-p0 {
         background: rgba(239, 68, 68, 0.1);
         color: #fca5a5;
         border: 1px solid rgba(239, 68, 68, 0.2);
         font-weight: 700;
+        box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
     }
 
     /* Service Tier Badges */
-    .badge-tier-t1 {
-        background: rgba(6, 182, 212, 0.08);
-        color: #22d3ee;
-        border: 1px solid rgba(6, 182, 212, 0.15);
+    .badge-tier-silver {
+        background: rgba(148, 163, 184, 0.08);
+        color: #94a3b8;
+        border: 1px solid rgba(148, 163, 184, 0.15);
     }
     
-    .badge-tier-t2 {
+    .badge-tier-gold {
+        background: rgba(245, 158, 11, 0.08);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.15);
+    }
+    
+    .badge-tier-platinum {
         background: rgba(139, 92, 246, 0.08);
         color: #c084fc;
         border: 1px solid rgba(139, 92, 246, 0.15);
-    }
-    
-    .badge-tier-t3 {
-        background: rgba(16, 185, 129, 0.08);
-        color: #34d399;
-        border: 1px solid rgba(16, 185, 129, 0.15);
-    }
-    
-    .badge-tier-t4 {
-        background: rgba(217, 70, 239, 0.08);
-        color: #f472b6;
-        border: 1px solid rgba(217, 70, 239, 0.15);
     }
 
     /* Actions column styling */
@@ -794,14 +795,15 @@
                 </div>
             </div>
 
-            <!-- Row 3: Tactile Service Level Pill Selector -->
+            <!-- Row 3: Tactile Priority Pill Selector (formerly Service Level) -->
             <div class="form-group">
-                <label class="form-label">Service Level</label>
+                <label class="form-label">Priority</label>
                 <div class="pill-selector" id="serviceLevelSelector">
-                    <div class="selector-pill active" onclick="selectServiceLevel('Standard')">Standard</div>
-                    <div class="selector-pill" onclick="selectServiceLevel('Priority')">Priority</div>
-                    <div class="selector-pill" onclick="selectServiceLevel('Urgent')">Urgent</div>
-                    <div class="selector-pill" onclick="selectServiceLevel('Critical')">Critical</div>
+                    <div class="selector-pill active" onclick="selectServiceLevel('p4')">p4</div>
+                    <div class="selector-pill" onclick="selectServiceLevel('p3')">p3</div>
+                    <div class="selector-pill" onclick="selectServiceLevel('p2')">p2</div>
+                    <div class="selector-pill" onclick="selectServiceLevel('p1')">p1</div>
+                    <div class="selector-pill" onclick="selectServiceLevel('p0')">p0</div>
                 </div>
             </div>
 
@@ -809,10 +811,9 @@
             <div class="form-group">
                 <label class="form-label">Service Tier</label>
                 <div class="pill-selector" id="serviceTierSelector">
-                    <div class="selector-pill active" onclick="selectServiceTier('Tier 1')">Tier 1</div>
-                    <div class="selector-pill" onclick="selectServiceTier('Tier 2')">Tier 2</div>
-                    <div class="selector-pill" onclick="selectServiceTier('Tier 3')">Tier 3</div>
-                    <div class="selector-pill" onclick="selectServiceTier('Tier 4')">Tier 4</div>
+                    <div class="selector-pill active" onclick="selectServiceTier('Silver')">Silver</div>
+                    <div class="selector-pill" onclick="selectServiceTier('Gold')">Gold</div>
+                    <div class="selector-pill" onclick="selectServiceTier('Platinum')">Platinum</div>
                 </div>
             </div>
         </div>
@@ -866,7 +867,7 @@
                         <th>Date</th>
                         <th>Consult #</th>
                         <th>Case #</th>
-                        <th>Level</th>
+                        <th>Priority</th>
                         <th>Tier</th>
                         <th>Assigned To</th>
                         <th style="text-align: right;">Action</th>
@@ -905,8 +906,8 @@ const staff = [
 
 let currentIndex = 0;
 let consultHistory = [];
-let selectedServiceLevel = "Standard";
-let selectedServiceTier = "Tier 1";
+let selectedServiceLevel = "p4";
+let selectedServiceTier = "Silver";
 
 // Helper function to find the next active staff member in rotation
 function getNextActiveIndex(fromIndex) {
@@ -929,14 +930,14 @@ function getTodayDateString() {
     return `${yyyy}-${mm}-${dd}`;
 }
 
-// Select Service Level Pill Function
+// Select Service Level (Priority) Pill Function
 function selectServiceLevel(level) {
     selectedServiceLevel = level;
     const selector = document.getElementById("serviceLevelSelector");
     if (!selector) return;
     const pills = selector.getElementsByClassName("selector-pill");
     for (let pill of pills) {
-        if (pill.textContent.trim() === level) {
+        if (pill.textContent.trim().toLowerCase() === level.toLowerCase()) {
             pill.classList.add("active");
         } else {
             pill.classList.remove("active");
@@ -951,7 +952,7 @@ function selectServiceTier(tier) {
     if (!selector) return;
     const pills = selector.getElementsByClassName("selector-pill");
     for (let pill of pills) {
-        if (pill.textContent.trim() === tier) {
+        if (pill.textContent.trim().toLowerCase() === tier.toLowerCase()) {
             pill.classList.add("active");
         } else {
             pill.classList.remove("active");
@@ -1211,9 +1212,9 @@ function addConsult() {
     consultInput.value = "";
     caseInput.value = "";
     
-    // Reset Service Level & Service Tier selectors back to defaults
-    selectServiceLevel("Standard");
-    selectServiceTier("Tier 1");
+    // Reset Priority (Service Level) & Service Tier selectors back to defaults
+    selectServiceLevel("p4");
+    selectServiceTier("Silver");
     
     // Subtle visual animation flare for the newly added row
     const firstRow = document.getElementById("historyTable").firstElementChild;
@@ -1225,21 +1226,51 @@ function addConsult() {
 }
 
 function getLevelBadgeClass(level) {
-    switch (level) {
-        case 'Priority': return 'badge-level-priority';
-        case 'Urgent': return 'badge-level-urgent';
-        case 'Critical': return 'badge-level-critical';
-        default: return 'badge-level-standard';
+    const lvl = String(level).toLowerCase();
+    switch (lvl) {
+        case 'p3': return 'badge-priority-p3';
+        case 'p2':
+        case 'priority': 
+            return 'badge-priority-p2';
+        case 'p1':
+        case 'urgent': 
+            return 'badge-priority-p1';
+        case 'p0':
+        case 'critical': 
+            return 'badge-priority-p0';
+        default: return 'badge-priority-p4';
     }
 }
 
+// Map service levels to formatted names (legacy support)
+function getFormattedLevel(level) {
+    const lvl = String(level).toLowerCase();
+    if (lvl === 'priority') return 'p2';
+    if (lvl === 'urgent') return 'p1';
+    if (lvl === 'critical') return 'p0';
+    return level;
+}
+
 function getTierBadgeClass(tier) {
-    switch (tier) {
-        case 'Tier 2': return 'badge-tier-t2';
-        case 'Tier 3': return 'badge-tier-t3';
-        case 'Tier 4': return 'badge-tier-t4';
-        default: return 'badge-tier-t1';
+    const t = String(tier).toLowerCase();
+    switch (t) {
+        case 'gold':
+        case 'tier 2':
+            return 'badge-tier-gold';
+        case 'platinum':
+        case 'tier 3':
+        case 'tier 4':
+            return 'badge-tier-platinum';
+        default: return 'badge-tier-silver';
     }
+}
+
+// Map service tiers to formatted names (legacy support)
+function getFormattedTier(tier) {
+    const t = String(tier).toLowerCase();
+    if (t === 'tier 2') return 'Gold';
+    if (t === 'tier 3' || t === 'tier 4') return 'Platinum';
+    return tier;
 }
 
 function renderHistoryTable() {
@@ -1268,8 +1299,8 @@ function renderHistoryTable() {
             shortDate = dateVal;
         }
 
-        const level = item.serviceLevel || "Standard";
-        const tier = item.serviceTier || "Tier 1";
+        const level = item.serviceLevel || "p4";
+        const tier = item.serviceTier || "Silver";
         
         row.innerHTML = `
             <td style="color: var(--text-secondary); font-size: 13px; font-weight: 500;">${escapeHtml(shortDate)}</td>
@@ -1277,12 +1308,12 @@ function renderHistoryTable() {
             <td style="font-family: monospace; font-size: 13px; color: var(--text-secondary);">${escapeHtml(item.caseNum)}</td>
             <td>
                 <span class="table-badge ${getLevelBadgeClass(level)}">
-                    <span>${escapeHtml(level)}</span>
+                    <span>${escapeHtml(getFormattedLevel(level))}</span>
                 </span>
             </td>
             <td>
                 <span class="table-badge ${getTierBadgeClass(tier)}">
-                    <span>${escapeHtml(tier)}</span>
+                    <span>${escapeHtml(getFormattedTier(tier))}</span>
                 </span>
             </td>
             <td>
@@ -1304,8 +1335,8 @@ function copyRow(id) {
     const item = consultHistory.find(x => x.id === id);
     if (!item) return;
     
-    const level = item.serviceLevel || "Standard";
-    const tier = item.serviceTier || "Tier 1";
+    const level = getFormattedLevel(item.serviceLevel || "p4");
+    const tier = getFormattedTier(item.serviceTier || "Silver");
     
     const textToCopy = `Consult #${item.consult} (Case: ${item.caseNum} | ${level} | ${tier}) is assigned to ${item.assignedTo}`;
     
