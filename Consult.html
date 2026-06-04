@@ -3,139 +3,980 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Consult Tracker</title>
+<title>Consult Tracker ⚡</title>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 20px;
-        background: #f5f7fa;
+    /* Reset & CSS Variables */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    .card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,.1);
+    :root {
+        --bg-color: #080c14;
+        --card-bg: rgba(17, 24, 39, 0.7);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --accent-gradient: linear-gradient(135deg, #a855f7 0%, #6366f1 50%, #3b82f6 100%);
+        --accent-hover: linear-gradient(135deg, #bc77ff 0%, #7c7fff 50%, #5a9bff 100%);
+        --shadow-glow: 0 8px 32px 0 rgba(139, 92, 246, 0.15);
+        --focus-ring: 0 0 0 3px rgba(139, 92, 246, 0.4);
+        
+        /* Person-specific theme colors */
+        --color-ace: #d946ef;
+        --color-james: #f59e0b;
+        --color-don: #10b981;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        background-image: 
+            radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+        overflow-x: hidden;
+    }
+
+    /* Container layout - Bento Grid Inspired */
+    .container {
+        width: 100%;
+        max-width: 1100px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin-top: 20px;
+    }
+
+    @media (min-width: 850px) {
+        .container {
+            grid-template-columns: 4fr 6fr;
+        }
+    }
+
+    /* Header styling */
+    header {
+        text-align: center;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .logo-container {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--card-border);
+        border-radius: 100px;
+        margin-bottom: 12px;
+    }
+
+    .logo-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #a855f7;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #a855f7;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.3); opacity: 0.5; }
+    }
+
+    .logo-text {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
     }
 
     h1 {
-        text-align: center;
+        font-size: 40px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        background: linear-gradient(to right, #ffffff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 6px;
     }
 
-    .next-person {
-        font-size: 24px;
-        font-weight: bold;
-        color: #0077ff;
+    .subtitle {
+        font-size: 15px;
+        color: var(--text-secondary);
+        margin-bottom: 10px;
+    }
+
+    /* Bento Cards */
+    .card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+        padding: 28px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 700;
         margin-bottom: 20px;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Assignee Card Highlights */
+    .assignee-display {
+        text-align: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 18px;
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .assignee-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .assignee-name {
+        font-size: 32px;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Custom avatar badges based on person */
+    .avatar-badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .assignee-name.theme-ace { color: var(--color-ace); text-shadow: 0 0 25px rgba(217, 70, 239, 0.2); }
+    .assignee-name.theme-ace .avatar-badge { background: rgba(217, 70, 239, 0.15); border: 1px solid rgba(217, 70, 239, 0.3); }
+
+    .assignee-name.theme-james { color: var(--color-james); text-shadow: 0 0 25px rgba(245, 158, 11, 0.2); }
+    .assignee-name.theme-james .avatar-badge { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    .assignee-name.theme-don { color: var(--color-don); text-shadow: 0 0 25px rgba(16, 185, 129, 0.2); }
+    .assignee-name.theme-don .avatar-badge { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); }
+
+    /* Forms */
+    .form-group {
+        margin-bottom: 18px;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        opacity: 0.6;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
     }
 
     input {
         width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
+        padding: 14px 14px 14px 40px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1.5px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        color: var(--text-primary);
+        font-size: 15px;
+        font-weight: 500;
+        transition: all 0.2s ease;
     }
 
-    button {
-        width: 100%;
-        padding: 12px;
+    input::placeholder {
+        color: rgba(148, 163, 184, 0.5);
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #a855f7;
+        box-shadow: var(--focus-ring);
+        background: rgba(15, 23, 42, 0.8);
+    }
+
+    /* Interactive Action Buttons */
+    .button-container {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    button.primary-btn {
+        flex: 1;
+        padding: 15px;
         border: none;
-        background: #0077ff;
+        background: var(--accent-gradient);
         color: white;
-        border-radius: 6px;
+        font-weight: 700;
+        border-radius: 14px;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: var(--shadow-glow);
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    button:hover {
-        background: #005ed1;
+    button.primary-btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 36px 0 rgba(139, 92, 246, 0.25);
+    }
+
+    button.primary-btn:active {
+        transform: translateY(1px) scale(0.98);
+    }
+
+    /* Secondary Clear/Reset Button */
+    button.secondary-btn {
+        padding: 14px;
+        border: 1.5px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-secondary);
+        border-radius: 14px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    button.secondary-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Stats Panel (Real-time Workloads) */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat-pill {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        padding: 10px 8px;
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-pill.active {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-val {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 2px;
+    }
+
+    .stat-val.ace { color: var(--color-ace); }
+    .stat-val.james { color: var(--color-james); }
+    .stat-val.don { color: var(--color-don); }
+
+    .stat-lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    }
+
+    /* Table / Receipt Log Container */
+    .table-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .history-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        background: rgba(139, 92, 246, 0.15);
+        color: #c084fc;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 100px;
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(10, 15, 30, 0.4);
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 25px;
-    }
-
-    th, td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: center;
+        text-align: left;
+        font-size: 14px;
     }
 
     th {
-        background: #0077ff;
-        color: white;
+        background: rgba(15, 23, 42, 0.8);
+        padding: 14px 16px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border-bottom: 1.5px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr {
+        transition: background 0.2s ease;
+    }
+
+    tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Assigned Badge styling in Table */
+    .table-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 8px;
+    }
+
+    .badge-ace {
+        background: rgba(217, 70, 239, 0.1);
+        color: #f472b6;
+        border: 1px solid rgba(217, 70, 239, 0.2);
+    }
+
+    .badge-james {
+        background: rgba(245, 158, 11, 0.1);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .badge-don {
+        background: rgba(16, 185, 129, 0.1);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    /* Actions column styling */
+    .action-cell {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .icon-action-btn {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .icon-action-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-primary);
+    }
+
+    .icon-action-btn.delete-btn:hover {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+
+    /* Empty state display */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+        opacity: 0.7;
+    }
+
+    .empty-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+        font-size: 15px;
+    }
+
+    .empty-subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        max-width: 250px;
+    }
+
+    /* Quick Copy Alert Popup */
+    .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #111827;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-left: 4px solid #a855f7;
+        color: var(--text-primary);
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transform: translateY(120%);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+        z-index: 1000;
+    }
+
+    .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    /* Keyframe Wobble for Validation failures */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-6px); }
+        40%, 80% { transform: translateX(6px); }
+    }
+
+    .shake-anim {
+        animation: shake 0.4s ease-in-out;
+    }
+
+    /* Sparkle highlight for newly added rows */
+    @keyframes highlight {
+        0% { background: rgba(139, 92, 246, 0.25); }
+        100% { background: transparent; }
+    }
+
+    .newly-added {
+        animation: highlight 1.5s ease-out forwards;
     }
 </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>Consult Tracker</h1>
+<header>
+    <div class="logo-container">
+        <div class="logo-dot"></div>
+        <span class="logo-text">VIBE CHECK AUTO-ROUTING</span>
+    </div>
+    <h1>Consult Tracker ⚡</h1>
+    <p class="subtitle">Assign consults fairly, stay organized, keep absolute track.</p>
+</header>
 
-    <div class="next-person">
-        Next Consult: <span id="currentPerson">Ace</span>
+<div class="container">
+    <!-- Form & Assignment Dashboard Card -->
+    <div class="card">
+        <div class="card-title">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+            Up Next
+        </div>
+
+        <div class="assignee-display">
+            <div class="assignee-label">Next up to claim</div>
+            <div id="assigneeWrapper" class="assignee-name theme-ace">
+                <span class="avatar-badge" id="assigneeEmoji">🦊</span>
+                <span id="currentPerson">Ace</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="consultNumber">Consult Number</label>
+            <div class="input-wrapper">
+                <div class="input-icon">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                    </svg>
+                </div>
+                <input type="text" id="consultNumber" placeholder="e.g. C-1049" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="caseNumber">Case Number</label>
+            <div class="input-wrapper">
+                <div class="input-icon">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <input type="text" id="caseNumber" placeholder="e.g. CAS-9381-Y" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="primary-btn" onclick="addConsult()">
+                <span>Lock It In</span>
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Workload Stats Counter -->
+        <div class="stats-container">
+            <div class="stat-pill" id="stat-ace">
+                <div class="stat-val ace" id="count-Ace">0</div>
+                <div class="stat-lbl">🦊 Ace</div>
+            </div>
+            <div class="stat-pill" id="stat-james">
+                <div class="stat-val james" id="count-James">0</div>
+                <div class="stat-lbl">⚡ James</div>
+            </div>
+            <div class="stat-pill" id="stat-don">
+                <div class="stat-val don" id="count-Don">0</div>
+                <div class="stat-lbl">🦕 Don</div>
+            </div>
+        </div>
     </div>
 
-    <label>Consult Number</label>
-    <input type="text" id="consultNumber">
+    <!-- Receipts / History Table Card -->
+    <div class="card table-card">
+        <div class="history-header">
+            <div class="card-title" style="margin-bottom: 0;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                The Receipts
+            </div>
+            <div class="history-badge" id="consultCounter">0 total</div>
+        </div>
 
-    <label>Case Number</label>
-    <input type="text" id="caseNumber">
+        <div class="table-wrapper">
+            <table id="consultTable">
+                <thead>
+                    <tr>
+                        <th>Consult #</th>
+                        <th>Case #</th>
+                        <th>Assigned To</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable">
+                    <!-- Dynamic entries will render here -->
+                </tbody>
+            </table>
+            
+            <div id="emptyState" class="empty-state">
+                <div class="empty-icon">📁</div>
+                <div class="empty-title">Log is looking pristine</div>
+                <div class="empty-subtitle">Ready to dispatch and route incoming consults.</div>
+            </div>
+        </div>
 
-    <button onclick="addConsult()">Save Consult</button>
+        <div style="margin-top: 16px; align-self: flex-end;">
+            <button class="secondary-btn" id="clearAllBtn" onclick="clearAllConsults()" style="display: none;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 6px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Wipe Log
+            </button>
+        </div>
+    </div>
+</div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Consult #</th>
-                <th>Case #</th>
-                <th>Assigned To</th>
-            </tr>
-        </thead>
-        <tbody id="historyTable"></tbody>
-    </table>
+<!-- Notification Toast for interactive feedback -->
+<div id="toast" class="toast">
+    <span id="toastIcon">✨</span>
+    <span id="toastMsg">Action completed!</span>
 </div>
 
 <script>
-const staff = ["Ace", "James", "Don"];
+const staff = [
+    { name: "Ace", emoji: "🦊", class: "theme-ace", badge: "badge-ace" },
+    { name: "James", emoji: "⚡", class: "theme-james", badge: "badge-james" },
+    { name: "Don", emoji: "🦕", class: "theme-don", badge: "badge-don" }
+];
 
 let currentIndex = 0;
+let consultHistory = [];
+
+// Initialize & Load local storage data safely
+window.onload = function() {
+    try {
+        const storedHistory = localStorage.getItem("consultHistory");
+        const storedIndex = localStorage.getItem("currentIndex");
+        
+        if (storedHistory) {
+            consultHistory = JSON.parse(storedHistory);
+            renderHistoryTable();
+            updateStats();
+        }
+        
+        if (storedIndex) {
+            currentIndex = parseInt(storedIndex, 10);
+            if (isNaN(currentIndex) || currentIndex >= staff.length) {
+                currentIndex = 0;
+            }
+        }
+    } catch (e) {
+        console.warn("localStorage is not available/disabled. Operating in memory-only mode.");
+    }
+    updateCurrentAssigneeUI();
+};
+
+function saveState() {
+    try {
+        localStorage.setItem("consultHistory", JSON.stringify(consultHistory));
+        localStorage.setItem("currentIndex", currentIndex);
+    } catch (e) {
+        console.error("Failed to save state to localStorage.");
+    }
+}
+
+function updateCurrentAssigneeUI() {
+    const person = staff[currentIndex];
+    const currentPersonEl = document.getElementById("currentPerson");
+    const emojiEl = document.getElementById("assigneeEmoji");
+    const wrapperEl = document.getElementById("assigneeWrapper");
+    
+    // Add pop-in scale effect transition
+    wrapperEl.style.transform = "scale(0.9)";
+    
+    setTimeout(() => {
+        currentPersonEl.textContent = person.name;
+        emojiEl.textContent = person.emoji;
+        
+        // Remove all theme classes and add the current one
+        wrapperEl.className = "assignee-name " + person.class;
+        wrapperEl.style.transform = "scale(1)";
+        
+        // Update highlight on workload stats cards
+        staff.forEach((s) => {
+            const pill = document.getElementById(`stat-${s.name.toLowerCase()}`);
+            if (s.name === person.name) {
+                pill.classList.add("active");
+                pill.style.borderColor = `var(--color-${s.name.toLowerCase()})`;
+            } else {
+                pill.classList.remove("active");
+                pill.style.borderColor = "";
+            }
+        });
+    }, 100);
+}
+
+function showToast(message, icon = "✨") {
+    const toast = document.getElementById("toast");
+    const toastMsg = document.getElementById("toastMsg");
+    const toastIcon = document.getElementById("toastIcon");
+    
+    toastMsg.textContent = message;
+    toastIcon.textContent = icon;
+    toast.classList.add("show");
+    
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2800);
+}
+
+function updateStats() {
+    // Reset counter UI
+    const counts = { "Ace": 0, "James": 0, "Don": 0 };
+    
+    // Total counts
+    consultHistory.forEach(item => {
+        if (counts[item.assignedTo] !== undefined) {
+            counts[item.assignedTo]++;
+        }
+    });
+    
+    // Update labels
+    for (const key in counts) {
+        document.getElementById(`count-${key}`).textContent = counts[key];
+    }
+    
+    const countTotal = consultHistory.length;
+    document.getElementById("consultCounter").textContent = `${countTotal} total`;
+    
+    // Show or hide empty elements depending on data presence
+    const emptyState = document.getElementById("emptyState");
+    const clearAllBtn = document.getElementById("clearAllBtn");
+    
+    if (countTotal > 0) {
+        emptyState.style.display = "none";
+        clearAllBtn.style.display = "inline-flex";
+    } else {
+        emptyState.style.display = "flex";
+        clearAllBtn.style.display = "none";
+    }
+}
 
 function addConsult() {
-    const consult = document.getElementById("consultNumber").value.trim();
-    const caseNum = document.getElementById("caseNumber").value.trim();
-
-    if (!consult || !caseNum) {
-        alert("Please enter both numbers.");
+    const consultInput = document.getElementById("consultNumber");
+    const caseInput = document.getElementById("caseNumber");
+    const consult = consultInput.value.trim();
+    const caseNum = caseInput.value.trim();
+    
+    let hasError = false;
+    
+    // Elegant visual shake feedback on validation error
+    if (!consult) {
+        consultInput.classList.add("shake-anim");
+        consultInput.style.borderColor = "#f43f5e";
+        setTimeout(() => {
+            consultInput.classList.remove("shake-anim");
+            consultInput.style.borderColor = "";
+        }, 600);
+        hasError = true;
+    }
+    
+    if (!caseNum) {
+        caseInput.classList.add("shake-anim");
+        caseInput.style.borderColor = "#f43f5e";
+        setTimeout(() => {
+            caseInput.classList.remove("shake-anim");
+            caseInput.style.borderColor = "";
+        }, 600);
+        hasError = true;
+    }
+    
+    if (hasError) {
+        showToast("Fill out all parameters, no cap! 🚫", "⚠️");
         return;
     }
 
     const assignedPerson = staff[currentIndex];
-
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-        <td>${consult}</td>
-        <td>${caseNum}</td>
-        <td>${assignedPerson}</td>
-    `;
-
-    document.getElementById("historyTable").appendChild(row);
-
+    
+    // Generate simple unique ID
+    const uniqueId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    
+    const newRecord = {
+        id: uniqueId,
+        consult: consult,
+        caseNum: caseNum,
+        assignedTo: assignedPerson.name,
+        emoji: assignedPerson.emoji,
+        badgeClass: assignedPerson.badge
+    };
+    
+    // Prepend new consults to show at the very top
+    consultHistory.unshift(newRecord);
+    
+    // Cycle staff assignee
     currentIndex = (currentIndex + 1) % staff.length;
+    
+    // Persist and render
+    saveState();
+    renderHistoryTable();
+    updateStats();
+    updateCurrentAssigneeUI();
+    
+    // Clear form inputs
+    consultInput.value = "";
+    caseInput.value = "";
+    
+    // Subtle visual animation flare for the newly added row
+    const firstRow = document.getElementById("historyTable").firstElementChild;
+    if (firstRow) {
+        firstRow.classList.add("newly-added");
+    }
+    
+    showToast(`Assigned to ${assignedPerson.name} ${assignedPerson.emoji}! Locked in.`, "🚀");
+}
 
-    document.getElementById("currentPerson").textContent =
-        staff[currentIndex];
+function renderHistoryTable() {
+    const tableBody = document.getElementById("historyTable");
+    tableBody.innerHTML = "";
+    
+    consultHistory.forEach(item => {
+        const row = document.createElement("tr");
+        row.setAttribute("data-id", item.id);
+        
+        row.innerHTML = `
+            <td style="font-weight: 700; color: var(--text-primary);">${escapeHtml(item.consult)}</td>
+            <td style="font-family: monospace; font-size: 13px; color: var(--text-secondary);">${escapeHtml(item.caseNum)}</td>
+            <td>
+                <span class="table-badge ${item.badgeClass}">
+                    <span>${item.emoji}</span>
+                    <span>${escapeHtml(item.assignedTo)}</span>
+                </span>
+            </td>
+            <td class="action-cell">
+                <button class="icon-action-btn" title="Copy Assignment Details" onclick="copyRow('${item.id}')">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                    </svg>
+                </button>
+                <button class="icon-action-btn delete-btn" title="Delete Log Entry" onclick="deleteRow('${item.id}')">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
 
-    document.getElementById("consultNumber").value = "";
-    document.getElementById("caseNumber").value = "";
+function copyRow(id) {
+    const item = consultHistory.find(x => x.id === id);
+    if (!item) return;
+    
+    const textToCopy = `⚡ Consult #${item.consult} (Case: ${item.caseNum}) is routed to ${item.assignedTo} ${item.emoji}`;
+    
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        showToast("Assignment copied to clipboard! 📋", "⚡");
+    }).catch(err => {
+        // Fallback for non-supported copy environments
+        const tempTextArea = document.createElement("textarea");
+        tempTextArea.value = textToCopy;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        try {
+            document.execCommand("copy");
+            showToast("Copied to clipboard! 📋", "⚡");
+        } catch (e) {
+            console.error("Fallback clipboard write failed", e);
+        }
+        document.body.removeChild(tempTextArea);
+    });
+}
+
+function deleteRow(id) {
+    // Animate removal first
+    const row = document.querySelector(`tr[data-id="${id}"]`);
+    if (row) {
+        row.style.transform = "translateX(-20px)";
+        row.style.opacity = "0";
+        row.style.transition = "all 0.3s ease";
+    }
+    
+    setTimeout(() => {
+        consultHistory = consultHistory.filter(item => item.id !== id);
+        saveState();
+        renderHistoryTable();
+        updateStats();
+        showToast("Log entry deleted.", "🗑️");
+    }, 250); // Match delete animation timer
+}
+
+function clearAllConsults() {
+    if (confirm("Are you sure you want to wipe the entire log? This cannot be undone.")) {
+        consultHistory = [];
+        currentIndex = 0;
+        saveState();
+        renderHistoryTable();
+        updateStats();
+        updateCurrentAssigneeUI();
+        showToast("Log fully cleared! Sparkling clean. ✨", "🧼");
+    }
+}
+
+function escapeHtml(string) {
+    return String(string).replace(/[&<>"']/g, function (s) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[s];
+    });
 }
 </script>
 
