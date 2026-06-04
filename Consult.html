@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consult Tracker</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #f5f7fa;
+    }
+
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.1);
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .next-person {
+        font-size: 24px;
+        font-weight: bold;
+        color: #0077ff;
+        margin-bottom: 20px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background: #0077ff;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background: #005ed1;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background: #0077ff;
+        color: white;
+    }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Consult Tracker</h1>
+
+    <div class="next-person">
+        Next Consult: <span id="currentPerson">Ace</span>
+    </div>
+
+    <label>Consult Number</label>
+    <input type="text" id="consultNumber">
+
+    <label>Case Number</label>
+    <input type="text" id="caseNumber">
+
+    <button onclick="addConsult()">Save Consult</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Consult #</th>
+                <th>Case #</th>
+                <th>Assigned To</th>
+            </tr>
+        </thead>
+        <tbody id="historyTable"></tbody>
+    </table>
+</div>
+
+<script>
+const staff = ["Ace", "James", "Don"];
+
+let currentIndex = 0;
+
+function addConsult() {
+    const consult = document.getElementById("consultNumber").value.trim();
+    const caseNum = document.getElementById("caseNumber").value.trim();
+
+    if (!consult || !caseNum) {
+        alert("Please enter both numbers.");
+        return;
+    }
+
+    const assignedPerson = staff[currentIndex];
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${consult}</td>
+        <td>${caseNum}</td>
+        <td>${assignedPerson}</td>
+    `;
+
+    document.getElementById("historyTable").appendChild(row);
+
+    currentIndex = (currentIndex + 1) % staff.length;
+
+    document.getElementById("currentPerson").textContent =
+        staff[currentIndex];
+
+    document.getElementById("consultNumber").value = "";
+    document.getElementById("caseNumber").value = "";
+}
+</script>
+
+</body>
+</html>
